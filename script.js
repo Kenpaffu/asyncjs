@@ -247,6 +247,12 @@ GOOD LUCK 😀
 
 // url = https://geocode.xyz/${},${}?geoit=json
 
+const randomCoords = (min, max) => {
+  return +(Math.random() * (max - min) + min).toFixed(3);
+};
+
+// console.log(randomCoords(-180, 180));
+
 const renderCountry = function (data, className = '') {
   const html = ` 
   <article class="country ${className}">
@@ -274,7 +280,7 @@ const whereAmI = (lat, lng) => {
       return response.json();
     })
     .then(data => {
-      console.log(data);
+      // console.log(data);
       if (!data.country) throw new Error(`Not valid coordinates`);
       console.log(`You are in ${data.country}`);
 
@@ -285,7 +291,7 @@ const whereAmI = (lat, lng) => {
       return response.json();
     })
     .then(data => {
-      console.log(data);
+      // console.log(data);
       if (!data[1]) {
         renderCountry(data[0]);
       } else {
@@ -298,7 +304,9 @@ const whereAmI = (lat, lng) => {
     .finally((countriesContainer.style.opacity = 1));
 };
 
-whereAmI(-33.933, 18.474);
+btn.addEventListener('click', function () {
+  whereAmI(19.037, 72.873);
+});
 
 /*
 § Coordinates 1: 52.508, 13.381 (Latitude, Longitude)
