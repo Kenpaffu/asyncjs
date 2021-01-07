@@ -247,6 +247,7 @@ GOOD LUCK 😀
 
 // url = https://geocode.xyz/${},${}?geoit=json
 
+/*
 const randomCoords = (min, max) => {
   return +(Math.random() * (max - min) + min).toFixed(3);
 };
@@ -276,7 +277,9 @@ const whereAmI = (lat, lng) => {
   fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`)
     .then(response => {
       if (!response.ok)
-        throw new Error(`Something went wrong ${error.message}`);
+        throw new Error(
+          `Something went wrong ${error.message}, ${response.status}`
+        );
       return response.json();
     })
     .then(data => {
@@ -287,7 +290,8 @@ const whereAmI = (lat, lng) => {
       return fetch(`https://restcountries.eu/rest/v2/name/${data.country}`);
     })
     .then(response => {
-      if (!response.ok) throw new Error(`Whoops, something went wrong`);
+      if (!response.ok)
+        throw new Error(`Whoops, something went wrong ${response.status}`);
       return response.json();
     })
     .then(data => {
@@ -308,8 +312,270 @@ btn.addEventListener('click', function () {
   whereAmI(19.037, 72.873);
 });
 
-/*
+
 § Coordinates 1: 52.508, 13.381 (Latitude, Longitude)
 § Coordinates 2: 19.037, 72.873
 § Coordinates 3: -33.933, 18.474
 */
+
+/*
+console.log('Test start');
+setTimeout(() => console.log('0 sec timer'), 0);
+Promise.resolve('Resolved Promise 1').then(res => console.log(res));
+
+Promise.resolve('Resolved promise 2').then(res => {
+  for (let i = 0; i < 1000000000; i++) {}
+  console.log(res);
+});
+
+console.log('Test end');
+*/
+
+///////////////////// Building a Simple Promise
+/*
+const lotteryPromise = new Promise(function (resolve, reject) {
+  console.log('Lottery Draw is happening!');
+  setTimeout(function () {
+    if (Math.random() >= 0.5) {
+      resolve('You Win! 🤑');
+    } else {
+      reject(new Error('You lost your money 💩'));
+    }
+  }, 2000);
+});
+
+lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
+
+// Promisifying setTimeout
+const wait = seconds => {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+wait(2)
+  .then(() => {
+    console.log('I waited for 2 seconds');
+    return wait(1);
+  })
+  .then(() => console.log('I waited for 1 second'));
+
+Promise.resolve('abc').then(x => console.log(x));
+Promise.reject(new Error('Problem!')).catch(x => console.error(x));
+*/
+
+/////////// PROMISIFYING
+/*
+// navigator.geolocation.getCurrentPosition(
+//   position => console.log(position),
+//   err => console.error(err)
+// );
+
+const getPosition = () => {
+  return new Promise((resolve, reject) => {
+    //   navigator.geolocation.getCurrentPosition(
+    //   position => resolve(position),
+    //   err => reject(err)
+    // )
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
+getPosition().then(pos => console.log(pos));
+
+const whereAmI = () => {
+  getPosition()
+    .then(pos => {
+      const { latitude: lat, longitude: lng } = pos.coords;
+
+      return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+    })
+    .then(response => {
+      if (!response.ok)
+        throw new Error(
+          `Something went wrong ${error.message}, ${response.status}`
+        );
+      return response.json();
+    })
+    .then(data => {
+      // console.log(data);
+      if (!data.country) throw new Error(`Not valid coordinates`);
+      console.log(`You are in ${data.country}`);
+
+      return fetch(`https://restcountries.eu/rest/v2/name/${data.country}`);
+    })
+    .then(response => {
+      if (!response.ok)
+        throw new Error(`Whoops, something went wrong ${response.status}`);
+      return response.json();
+    })
+    .then(data => {
+      // console.log(data);
+      if (!data[1]) {
+        renderCountry(data[0]);
+      } else {
+        renderCountry(data[1]);
+      }
+    })
+    .catch(err => {
+      console.error(`${err.message}`);
+    })
+    .finally((countriesContainer.style.opacity = 1));
+};
+
+btn.addEventListener('click', whereAmI);
+*/
+
+////////////////// Coding Challenge #2
+/*
+For this challenge you will actually have to watch the video! Then, build the image
+loading functionality that I just showed you on the screen.
+
+Your tasks:
+
+Tasks are not super-descriptive this time, so that you can figure out some stuff by
+yourself. Pretend you're working on your own 😉
+
+PART 1
+
+1. Create a function 'createImage' which receives 'imgPath' as an input. This function returns a promise which creates a new image (use document.createElement('img')) and sets the .src attribute to the provided image path
+
+2. When the image is done loading, append it to the DOM element with the 'images' class, and resolve the promise. The fulfilled value should be the image element itself. In case there is an error loading the image (listen for the'error' event), reject the promise
+
+3. If this part is too tricky for you, just watch the first part of the solution
+
+PART 2
+4. Consume the promise using .then and also add an error handler
+
+5. After the image has loaded, pause execution for 2 seconds using the 'wait'
+function we created earlier
+
+6. After the 2 seconds have passed, hide the current image (set display CSS
+property to 'none'), and load a second image
+
+(Hint: Use the image element returned by the 'createImage' promise to hide the current image. You will need a global variable for that 😉)
+
+7. After the second image has loaded, pause execution for 2 seconds again
+
+8. After the 2 seconds have passed, hide the current image
+
+Test data: Images in the img folder. Test the error handler by passing a wrong
+image path. Set the network speed to “Fast 3G” in the dev tools Network tab,
+otherwise images load too fast
+
+GOOD LUCK 😀
+*/
+
+/*
+const wait = seconds => {
+  return new Promise(resolve => {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+// wait(2).then(x => console.log('Hello'));
+
+const createImage = imgPath => {
+  return new Promise((resolve, reject) => {
+    let pic = document.createElement('img');
+    pic.src = imgPath;
+    const imgEl = document.querySelector('.images');
+    resolve(imgEl.appendChild(pic));
+    reject(new Error('Whoops'));
+  });
+};
+
+createImage('/img/img-1.jpg')
+  .then(pic => {
+    wait(2).then(() => {
+      pic.style.display = 'none';
+    });
+    return wait(2);
+  })
+  .then(pic => {
+    return createImage('/img/img-2.jpg');
+  })
+  .then(pic => {
+    wait(2).then(() => {
+      pic.style.display = 'none';
+    });
+    return wait(2);
+  })
+  .then(_ => {
+    return createImage('/img/img-3.jpg');
+  });
+  */
+/*
+fetch('https://statsapi.web.nhl.com/api/v1/teams')
+  .then(res => {
+    return res.json();
+  })
+  .then(data => {
+    console.log(data);
+  });
+*/
+
+/////////// ASYNC AWAIT
+
+const renderCountry = function (data, className = '') {
+  const html = ` 
+  <article class="country ${className}">
+  <img class="country__img" src="${data.flag}" />
+  <div class="country__data">
+    <h3 class="country__name">${data.name}</h3>
+    <h4 class="country__region">${data.region}</h4>
+    <p class="country__row"><span>👫</span>${(
+      +data.population / 1000000
+    ).toFixed(1)} people</p>
+    <p class="country__row"><span>🗣️</span>${data.languages[0].name}</p>
+    <p class="country__row"><span>💰</span>${data.currencies[0].name}</p>
+  </div>
+</article>`;
+
+  countriesContainer.insertAdjacentHTML('beforeend', html);
+  countriesContainer.style.opacity = 1;
+};
+
+const renderError = function (msg) {
+  countriesContainer.insertAdjacentText('beforeend', msg);
+  countriesContainer.style.opacity = 1;
+};
+
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
+const whereAmI = async function () {
+  try {
+    // Geolocation
+    const pos = await getPosition();
+    const { latitude: lat, longitude: lng } = pos.coords;
+
+    // Reverse Geocoding
+    const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+    if (!resGeo.ok) throw new Error('Problem getting location data');
+
+    const dataGeo = await resGeo.json();
+
+    // Country data
+    const res = await fetch(`https://restcountries.eu/rest/v2/name/usa`);
+    if (!resGeo.ok) throw new Error('Problem getting Country');
+    const data = await res.json();
+    renderCountry(data[0]);
+  } catch (err) {
+    console.error(err);
+    renderError(`${err.message}`);
+  }
+};
+
+whereAmI();
+
+// try {
+//   let y = 1;
+//   const x = 2;
+//   x = 3;
+// } catch (err) {
+//   alert(err.message);
+// }
